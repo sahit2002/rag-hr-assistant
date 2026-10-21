@@ -14,7 +14,7 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import APIRouter, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -77,18 +77,21 @@ class StatusResponse(BaseModel):
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
 
-@app.get("/health")
+router = APIRouter()
+
+
+@router.get("/health")
 def health() -> Dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/status", response_model=StatusResponse)
+@router.get("/status", response_model=StatusResponse)
 def status() -> StatusResponse:
     stats = get_index_stats()
     return StatusResponse(**stats)
 
 
-@app.post("/ingest", response_model=IngestResponse)
+@router.post("/ingest", response_model=IngestResponse)
 async def ingest_pdf(file: UploadFile = File(...)) -> IngestResponse:
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
@@ -109,7 +112,7 @@ async def ingest_pdf(file: UploadFile = File(...)) -> IngestResponse:
     )
 
 
-@app.post("/query", response_model=QueryResponse)
+@router.post("/query", response_model=QueryResponse)
 def query(request: QueryRequest) -> QueryResponse:
     if not request.question.strip():
         raise HTTPException(status_code=400, detail="Question must not be empty.")
@@ -127,3 +130,7 @@ def query(request: QueryRequest) -> QueryResponse:
         query_type=result["query_type"],
         sub_queries=result["sub_queries"],
     )
+
+
+app.include_router(router)
+app.include_router(router, prefix="/api")
