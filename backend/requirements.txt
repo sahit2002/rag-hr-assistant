@@ -1,0 +1,29 @@
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+pydantic==2.7.1
+pydantic-settings==2.3.0
+
+# LangChain stack
+langchain==0.2.5
+langchain-community==0.2.5
+langchain-core==0.2.9
+langchain-groq==0.1.6
+
+# PDF ingestion
+pypdf==4.2.0
+
+# Embeddings (local, zero-cost)
+sentence-transformers==3.0.1
+faiss-cpu==1.8.0
+
+# Cross-encoder re-ranking
+# included via sentence-transformers
+
+# RAGAS evaluation
+ragas==0.1.14
+datasets==2.19.2
+
+# Utilities
+python-dotenv==1.0.1
+numpy==1.26.4

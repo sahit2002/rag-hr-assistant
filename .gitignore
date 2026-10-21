@@ -1,0 +1,34 @@
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Environment variables (keep .env.example tracked)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# ---- Backend (Python) ----
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Backend data / generated artifacts
+backend/data/pdfs/
+backend/data/faiss_index/
+backend/eval/results.jsonl
+
+# ---- Frontend (Next.js) ----
+node_modules/
+.next/
+out/
+*.tsbuildinfo

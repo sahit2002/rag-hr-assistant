@@ -1,0 +1,12 @@
+# Rename this file to .gitignore
+.env
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+data/pdfs/
+data/faiss_index/
+eval/results.jsonl
+*.egg-info/
+dist/
+.DS_Store
