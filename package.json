@@ -1,0 +1,12 @@
+{
+  "name": "rag-hr-assistant",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "dev": "cd frontend && npm run dev",
+    "start": "cd frontend && npm run start"
+  },
+  "dependencies": {
+    "next": "^14.2.35"
+  }
+}
