@@ -23,8 +23,9 @@ export default function UploadBox({ apiUrl, onSuccess }: Props) {
     setMessage(null);
     const form = new FormData();
     form.append("file", file);
+    const baseApi = apiUrl.replace(/\/+$/, "");
     try {
-      const res = await fetch(`${apiUrl}/ingest`, {
+      const res = await fetch(`${baseApi}/ingest`, {
         method: "POST",
         body: form,
       });

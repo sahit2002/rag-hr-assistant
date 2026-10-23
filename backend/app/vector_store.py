@@ -44,6 +44,7 @@ def _embed(texts: List[str]) -> np.ndarray:
 # ── Persistence ──────────────────────────────────────────────────────────────
 
 def save_index() -> None:
+    _INDEX_FILE.parent.mkdir(parents=True, exist_ok=True)
     faiss.write_index(_INDEX, str(_INDEX_FILE))
     with open(_DOCS_FILE, "wb") as f:
         pickle.dump(_DOCS, f)

@@ -19,11 +19,22 @@ from app.query_router import route_and_expand
 from app.reranker import rerank
 from app.vector_store import query_index
 
-_llm = ChatGroq(
-    model=settings.groq_model,
-    temperature=0.2,
-    groq_api_key=settings.groq_api_key,
-)
+_llm: ChatGroq | None = None
+
+
+def _get_llm() -> ChatGroq:
+    global _llm
+    if _llm is None:
+        if not settings.groq_api_key or settings.groq_api_key == "your_groq_api_key_here":
+            raise RuntimeError(
+                "GROQ_API_KEY is not configured. Please set GROQ_API_KEY in your environment variables."
+            )
+        _llm = ChatGroq(
+            model=settings.groq_model,
+            temperature=0.2,
+            groq_api_key=settings.groq_api_key,
+        )
+    return _llm
 
 _RAG_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -114,7 +125,7 @@ def run_rag(question: str) -> Dict[str, Any]:
     chain = (
         RunnablePassthrough()
         | _RAG_PROMPT
-        | _llm
+        | _get_llm()
         | StrOutputParser()
     )
     answer: str = chain.invoke({"context": context_str, "question": question})

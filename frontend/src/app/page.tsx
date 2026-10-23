@@ -23,7 +23,7 @@ export interface QueryResult {
   sub_queries: string[];
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/+$/, "");
 
 export default function HomePage() {
   const [queryResult, setQueryResult] = useState<QueryResult | null>(null);

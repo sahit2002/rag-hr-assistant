@@ -32,13 +32,23 @@ app = FastAPI(
     version="1.0.0",
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+cors_origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+if "*" in cors_origins or not cors_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 # ── Models ─────────────────────────────────────────────────────────────────────
@@ -80,6 +90,18 @@ class StatusResponse(BaseModel):
 router = APIRouter()
 
 
+@router.get("/")
+def root() -> Dict[str, Any]:
+    return {
+        "name": "HR Policy RAG Assistant API",
+        "status": "online",
+        "health": "/health",
+        "status_endpoint": "/status",
+        "docs": "/docs",
+        "version": "1.0.0",
+    }
+
+
 @router.get("/health")
 def health() -> Dict[str, str]:
     return {"status": "ok"}
@@ -96,7 +118,8 @@ async def ingest_pdf(file: UploadFile = File(...)) -> IngestResponse:
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
-    dest = Path(settings.pdf_upload_dir) / file.filename
+    safe_filename = Path(file.filename).name
+    dest = Path(settings.pdf_upload_dir) / safe_filename
     with open(dest, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
@@ -106,7 +129,7 @@ async def ingest_pdf(file: UploadFile = File(...)) -> IngestResponse:
     after = get_index_stats()["total_chunks"]
 
     return IngestResponse(
-        filename=file.filename,
+        filename=safe_filename,
         chunks_added=after - before,
         total_indexed=after,
     )

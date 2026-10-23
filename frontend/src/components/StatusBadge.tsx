@@ -17,7 +17,8 @@ export default function StatusBadge({ apiUrl, refresh }: Props) {
   const [status, setStatus] = useState<StatusData | null>(null);
 
   useEffect(() => {
-    fetch(`${apiUrl}/status`)
+    const baseApi = apiUrl.replace(/\/+$/, "");
+    fetch(`${baseApi}/status`)
       .then((r) => r.json())
       .then(setStatus)
       .catch(() => setStatus(null));

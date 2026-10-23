@@ -20,11 +20,23 @@ from app.config import settings
 
 QueryType = Literal["single_fact", "multi_part", "summarization"]
 
-_llm = ChatGroq(
-    model=settings.groq_model,
-    temperature=0,
-    groq_api_key=settings.groq_api_key,
-)
+_llm: ChatGroq | None = None
+
+
+def _get_llm() -> ChatGroq:
+    global _llm
+    if _llm is None:
+        if not settings.groq_api_key or settings.groq_api_key == "your_groq_api_key_here":
+            raise RuntimeError(
+                "GROQ_API_KEY is not configured. Please set GROQ_API_KEY in your environment variables."
+            )
+        _llm = ChatGroq(
+            model=settings.groq_model,
+            temperature=0,
+            groq_api_key=settings.groq_api_key,
+        )
+    return _llm
+
 
 # ── Routing ──────────────────────────────────────────────────────────────────
 
@@ -46,7 +58,7 @@ Reply with ONLY the label, nothing else.""",
 
 
 def classify_query(query: str) -> QueryType:
-    chain = _ROUTE_PROMPT | _llm
+    chain = _ROUTE_PROMPT | _get_llm()
     result = chain.invoke({"query": query})
     label = result.content.strip().lower()
     if label in ("single_fact", "multi_part", "summarization"):
@@ -76,7 +88,7 @@ Do not add any commentary.""",
 
 
 def decompose_query(query: str) -> List[str]:
-    chain = _DECOMPOSE_PROMPT | _llm
+    chain = _DECOMPOSE_PROMPT | _get_llm()
     result = chain.invoke({"query": query})
     lines = result.content.strip().splitlines()
     sub_queries: List[str] = []

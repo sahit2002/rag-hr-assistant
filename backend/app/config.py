@@ -6,8 +6,8 @@ from pathlib import Path
 
 
 class Settings(BaseSettings):
-    groq_api_key: str
-    groq_model: str = "llama3-70b-8192"
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
     faiss_index_path: str = "data/faiss_index"
     pdf_upload_dir: str = "data/pdfs"
     embed_model: str = "sentence-transformers/all-MiniLM-L6-v2"
@@ -16,9 +16,11 @@ class Settings(BaseSettings):
     chunk_overlap: int = 80
     top_k_retrieval: int = 10
     top_k_rerank: int = 4
+    cors_origins: str = "*"
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 
 settings = Settings()
