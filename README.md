@@ -1,3 +1,13 @@
+---
+title: HR Policy RAG Assistant
+emoji: 🏢
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # HR Policy RAG Assistant
 
 > **AI Engineering Masters Program — Phase 1: RAG Foundations**
