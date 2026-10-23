@@ -1,4 +1,0 @@
-# Offline evaluation dependencies
--r requirements.txt
-ragas==0.1.14
-datasets==2.19.2

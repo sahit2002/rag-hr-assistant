@@ -7,6 +7,7 @@ Exposes query_index(question, k) → list of (Document, score).
 """
 from __future__ import annotations
 
+import gc
 import json
 import pickle
 from pathlib import Path
@@ -14,10 +15,18 @@ from typing import List, Tuple
 
 import faiss
 import numpy as np
+import torch
 from langchain_core.documents import Document
 from sentence_transformers import SentenceTransformer
 
 from app.config import settings
+
+# Force PyTorch to use 1 thread to keep CPU and memory usage lightweight
+torch.set_num_threads(1)
+try:
+    torch.set_num_interop_threads(1)
+except RuntimeError:
+    pass
 
 _EMBED_MODEL: SentenceTransformer | None = None
 _INDEX: faiss.Index | None = None
@@ -37,7 +46,14 @@ def _get_embed_model() -> SentenceTransformer:
 
 def _embed(texts: List[str]) -> np.ndarray:
     model = _get_embed_model()
-    vecs = model.encode(texts, normalize_embeddings=True, show_progress_bar=False)
+    with torch.inference_mode():
+        vecs = model.encode(
+            texts,
+            normalize_embeddings=True,
+            show_progress_bar=False,
+            batch_size=16,
+        )
+    gc.collect()
     return vecs.astype(np.float32)
 
 

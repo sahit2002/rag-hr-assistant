@@ -13,16 +13,9 @@ langchain-groq==0.1.6
 # PDF ingestion
 pypdf==4.2.0
 
-# Embeddings (local, zero-cost)
+# Embeddings & Vector store
 sentence-transformers==3.0.1
 faiss-cpu==1.8.0
-
-# Cross-encoder re-ranking
-# included via sentence-transformers
-
-# RAGAS evaluation (optional, see requirements-eval.txt)
-# ragas==0.1.14
-# datasets==2.19.2
 
 # Utilities
 python-dotenv==1.0.1
