@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Tuple
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough
 from langchain_groq import ChatGroq
 
 from app.config import settings
@@ -35,6 +35,7 @@ def _get_llm() -> ChatGroq:
             groq_api_key=settings.groq_api_key,
         )
     return _llm
+
 
 _RAG_PROMPT = ChatPromptTemplate.from_messages(
     [

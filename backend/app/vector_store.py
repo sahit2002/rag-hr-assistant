@@ -72,9 +72,11 @@ def load_index() -> bool:
     """Load persisted index from disk.  Returns True if successful."""
     global _INDEX, _DOCS
     if _INDEX_FILE.exists() and _DOCS_FILE.exists():
-        _INDEX = faiss.read_index(str(_INDEX_FILE))
+        # Load both before assigning so a failure never leaves them out of sync.
+        index = faiss.read_index(str(_INDEX_FILE))
         with open(_DOCS_FILE, "rb") as f:
-            _DOCS = pickle.load(f)
+            docs = pickle.load(f)
+        _INDEX, _DOCS = index, docs
         return True
     return False
 
@@ -86,7 +88,7 @@ def build_index(chunks: List[Document]) -> None:
     Embed chunks and build (or extend) the FAISS flat-IP index.
     Duplicate doc_ids are skipped to allow incremental ingestion.
     """
-    global _INDEX, _DOCS
+    global _INDEX
 
     # Load existing if present
     if _INDEX is None:
@@ -116,7 +118,6 @@ def query_index(question: str, k: int | None = None) -> List[Tuple[Document, flo
     Return top-k (Document, cosine_score) pairs for the given question.
     Raises RuntimeError if the index has not been built yet.
     """
-    global _INDEX, _DOCS
     if _INDEX is None:
         loaded = load_index()
         if not loaded or _INDEX is None:
@@ -139,7 +140,6 @@ def query_index(question: str, k: int | None = None) -> List[Tuple[Document, flo
 
 
 def get_index_stats() -> dict:
-    global _INDEX, _DOCS
     if _INDEX is None:
         load_index()
     return {
